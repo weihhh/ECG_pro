@@ -4,6 +4,8 @@ import pywt
 import math
 import numpy as np
 
+#钱升宜 计算RR间期和初始阈值使用ECG信号前20s数据
+
 matfn = u'C:/Users/qsy/Desktop/Rselect/ecgdata.mat'
 data=sio.loadmat(matfn)
 
