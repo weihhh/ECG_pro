@@ -18,3 +18,7 @@ build
 *.BMP
 *.pdf
 *.html
+
+#logs
+*.log
+*.logs
