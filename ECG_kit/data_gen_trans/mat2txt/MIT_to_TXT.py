@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from scipy import io
 from scipy import stats
 
-path=r'D:\aa_work\新学期项目及论文\心电图项目\数据集\MIT-BIH Arrhythmia Database\mat_data'
+path=r'D:\aa_work\ECG\ECG_DATA_ALL\mat_data'
 
 def get_files(path,recurse=False):
     '''
@@ -39,7 +39,7 @@ def load_mat(folder,file_name):
 
 files_list=[i for i in get_files(path) if os.path.basename(i).rfind('ANNOTD.mat')!=-1]
 #这里控制处理几个文件
-for file in files_list[:3]:
+for file in files_list[:2]:
     index=os.path.basename(file)[:3]
     print('处理文件序号： ',index) 
     
@@ -50,7 +50,9 @@ for file in files_list[:3]:
         ii_sample=ECG_matrxi[:,1]#(648000,)
     else:
         ii_sample=ECG_matrxi[:,0]#(648000,)
-
+    # 改变波形单位uv-mv
+    ii_sample=ii_sample*1000
+    ii_sample=ii_sample.astype(int)
     #注释
     annotation=load_mat(path,'{}ANNOTD.mat'.format(index))
     annotation_matrix=annotation['ANNOTD'].flatten()#(2266，1)
@@ -65,12 +67,17 @@ for file in files_list[:3]:
     print('MIT_ECG_DATA in :{}'.format(os.getcwd()))
     #写入波形数据
     with open(os.path.join(os.getcwd(),'MIT_ECG_DATA',index+'mit_wave.txt'),'wt') as f:
+        #暂时补全为12导联，II导联处于第二行
+        f.write('145'+'\n')
         for i,data in enumerate(ii_sample):
             if i ==0:
                 f.write(str(data))
             else:
                 f.write(',')
                 f.write(str(data))
+
+        for i in range(10):
+            f.write('\n'+'145')
     #写入标注文件
     with open(os.path.join(os.getcwd(),'MIT_ECG_DATA',index+'mit_ann.txt'),'wt') as f:
         for time,ann in zip(annotation_sampleno,annotation_matrix):

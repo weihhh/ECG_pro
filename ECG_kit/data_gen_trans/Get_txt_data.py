@@ -30,14 +30,14 @@ import os
 
 ECG_LEADS=['MDC_ECG_LEAD_V1','MDC_ECG_LEAD_V2','MDC_ECG_LEAD_V3','MDC_ECG_LEAD_V4','MDC_ECG_LEAD_V5','MDC_ECG_LEAD_V6','MDC_ECG_LEAD_I','MDC_ECG_LEAD_II','MDC_ECG_LEAD_III','MDC_ECG_LEAD_AVF','MDC_ECG_LEAD_AVL','MDC_ECG_LEAD_AVR']
 ECG_CLASS=[1,2,3,5,12]
-ECG_DATA_PATH=r'D:\aa_learning\pypro\python3-practice\ECG_classification\ECG_kit\ECG_DATA'
+ECG_DATA_PATH=r'D:\aa_work\ECG\ECG_DATA_ALL\MIT_ECG_DATA'
 ECG_LENGTH=15000
 
 def transform_labels(labels):
     '''
     '''
     if not isinstance(labels,np.ndarray):
-        print('here')
+        print('Tranfer to array!')
         labels=np.array(labels)
     array_resape=labels.reshape(-1)
     le =LabelEncoder()
@@ -46,7 +46,9 @@ def transform_labels(labels):
 
 def transform_list_lables(labels,labels_used):
     '''
-    [1,2,3,5,12]
+    labels：待转换labels
+    label_used:将label转换为label在label_used中的序号
+    labels：list，其中标注为int
     '''
     switcher={}
     for no,label in enumerate(labels_used):
@@ -55,6 +57,7 @@ def transform_list_lables(labels,labels_used):
     print('其他：{}'.format(len(labels_used)))
     for no,j in enumerate(labels):
         j=int(j)
+        #字典中没有的话就设置为len(labes_used)，表示其他
         labels[no]=switcher.get(j,len(labels_used))
     return labels
     # if j==1:
@@ -109,6 +112,9 @@ def get_txt_wave(filename,lead_name,lead_list):
             print('导联名称错误,不在导联列表中！---get_txt_wave()')
 def get_txt_ann(filename):
     '''
+    读取ann.txt文件
+    time_list:标注的时间点
+    ann_list:标注
     '''
     time_list=[]
     ann_list=[]
@@ -146,7 +152,7 @@ def check_data(path,lead_list,leads_used='ALL'):
     if not err_list:
         print('all right!')
     else:
-        print('wrong length: '.format(err_list))
+        print('wrong length: {}'.format(err_list))
 
 def network_input(path,lead_list,leads_used='ALL'):
     '''
@@ -163,7 +169,7 @@ def network_input(path,lead_list,leads_used='ALL'):
 
     # wave_data_list=[]
     for filename in wave_files:
-        #字典存储使用的导联
+        #字典存储使用的导联，一个lead_dict中包括了所有使用的导联数据和对应的标注和标注时间
         print('现在处理： {}'.format(filename))
         lead_dict={}
         for lead_name in leads_used:
@@ -178,7 +184,7 @@ def network_input(path,lead_list,leads_used='ALL'):
 
 def main():
 
-    #生成器
+    #生成器，验证导联数目，
     # all_data=network_input(ECG_DATA_PATH,ECG_LEADS)
     # for file_data in all_data:
     #     # print('数据字典属性： {}'.format(file_data.keys()))
@@ -187,9 +193,10 @@ def main():
     #         assert(len(i)==ECG_LENGTH)
             # plt.plot(i)
             # plt.show()
-    x=get_txt_ann(r'D:\aa_learning\pypro\python3-practice\ECG_classification\ECG_kit\ECG_DATA'+r'\201801051344_03759378_金祖行_ann.txt')
-    print(transform_list_lables(x[1],[1,2,3,5,12]))
+    time_list,ann_list=get_txt_ann(r'D:\aa_work\ECG\ECG_DATA_ALL\ECG_DATA'+r'\201801051344_03759378_金祖行_ann.txt')
+    print(ann_list)
+    print(transform_list_lables(ann_list,[1,2,3,5,12]))
     # transform_labels(test_list)
-    # check_data(ECG_DATA_PATH,ECG_LEADS)
+    check_data(ECG_DATA_PATH,ECG_LEADS)
 if __name__ == '__main__':
   main()

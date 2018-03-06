@@ -10,7 +10,7 @@ from Alexnet_ecg_model import tensor_dataset
 def read_data_sets():
 
     #unpickle
-    with open(r'D:\aa_learning\pypro\python3-practice\ECG_classification\ECG_kit\ECG_10S_data.pickle','rb') as f:
+    with open(r'D:\aa_work\ECG\ECG_DATA_ALL\ECG_10S_data.pickle','rb') as f:
         all_ecg_list,all_ann_list,all_file_list=pickle.load(f)
     
     print('所有心电信号：{} '.format(np.array(all_ecg_list).shape))#(46, 180, 3600)
