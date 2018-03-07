@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
-#将MIT_mat文件中的原始ECG数据，重写为项目约定格式
+#将MIT_mat文件中的原始ECG数据，重写为项目约定格式，标注的时间用的是采样点序号
 
 import os
 import numpy as np
@@ -60,6 +60,7 @@ for file in files_list[:2]:
     #注释矩阵对应时间
     annotation_time=load_mat(path,'{}ATRTIMED.mat'.format(index))
     annotation_time_matrix=annotation_time['ATRTIMED']#(2266，1)
+    #标注时间转换为采样点序号
     annotation_sampleno=[(R_time*360).astype(int) for R_time in annotation_time_matrix.flatten()]
     
     if not os.path.exists(os.path.join(os.getcwd(),'MIT_ECG_DATA')):

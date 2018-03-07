@@ -100,21 +100,21 @@ def get_txt_wave(filename,lead_name,lead_list):
     filename：记录名称
     lead_name:想获得的导联
     lead_list:导联列表，展示顺序
-    return： wave_data_list
+    return： wave_data_list，已转换为int类型
     '''
     with open(filename,'rt') as f:
         #注意这里读取的时候要去掉首尾换行符
         lead_index=lead_list.index(lead_name)
         if lead_index!=-1:
             wave_list=f.readlines()[lead_index].strip('\n').split(',')#读取整个文件所有行，保存在一个列表(list)变量中，每行作为一个元素
-            return wave_list
+            return [int(i) for i in wave_list]#转换为int
         else:
             print('导联名称错误,不在导联列表中！---get_txt_wave()')
 def get_txt_ann(filename):
     '''
     读取ann.txt文件
-    time_list:标注的时间点
-    ann_list:标注
+    time_list:标注的时间点int
+    ann_list:标注int
     '''
     time_list=[]
     ann_list=[]
@@ -124,7 +124,7 @@ def get_txt_ann(filename):
         for str_i in ann_list_str:
             ann_list.append(str_i.strip('\n').split(',')[1])
             time_list.append(str_i.strip('\n').split(',')[0])
-    return time_list,ann_list
+    return [int(i) for i in time_list],[int(i) for i in ann_list]
 
 
 def check_data(path,lead_list,leads_used='ALL'):
