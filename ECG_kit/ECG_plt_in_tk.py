@@ -5,13 +5,14 @@
 #心电数据程序
 __author__='weizhang'
 
+#图形界面包
 from tkinter import *
 from tkinter.filedialog import askdirectory
 import tkinter.messagebox as messagebox
 from tkinter import ttk 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg  
 
-import matplotlib.pyplot as plt      #python画图包
+import matplotlib.pyplot as plt      
 from matplotlib.figure import Figure  
 
 #xml 模块
@@ -21,6 +22,7 @@ import xml.dom.minidom
 import os,pickle
 import logging
 
+#R波识别模块
 import R_reco
 
 #设置等级为WARNING,相当于不输出信息，程序中用的大多是info
@@ -30,16 +32,15 @@ logging.basicConfig(level=logging.WARNING ,
                 filename='ECG_GUI.log',
                 filemode='w')
 
-ECG_leads_list=['MDC_ECG_LEAD_V1','MDC_ECG_LEAD_V2','MDC_ECG_LEAD_V3','MDC_ECG_LEAD_V4','MDC_ECG_LEAD_V5','MDC_ECG_LEAD_V6','MDC_ECG_LEAD_I','MDC_ECG_LEAD_II','MDC_ECG_LEAD_III','MDC_ECG_LEAD_AVF','MDC_ECG_LEAD_AVL','MDC_ECG_LEAD_AVR']
+# ECG_leads_list=['MDC_ECG_LEAD_V1','MDC_ECG_LEAD_V2','MDC_ECG_LEAD_V3','MDC_ECG_LEAD_V4','MDC_ECG_LEAD_V5','MDC_ECG_LEAD_V6','MDC_ECG_LEAD_I','MDC_ECG_LEAD_II','MDC_ECG_LEAD_III','MDC_ECG_LEAD_AVF','MDC_ECG_LEAD_AVL','MDC_ECG_LEAD_AVR']
+ECG_leads_list=['MDC_ECG_LEAD_I','MDC_ECG_LEAD_II','MDC_ECG_LEAD_III','MDC_ECG_LEAD_AVR','MDC_ECG_LEAD_AVL','MDC_ECG_LEAD_AVF','MDC_ECG_LEAD_V1','MDC_ECG_LEAD_V2','MDC_ECG_LEAD_V3','MDC_ECG_LEAD_V4','MDC_ECG_LEAD_V5','MDC_ECG_LEAD_V6']
+
 Current_path=os.getcwd()
+#存放xml文件的目录
 ECG_XML_path=None
 print('现在的工作目录、心电xml目录：{}、{}'.format(Current_path,ECG_XML_path))
 
-# def thesis_option(event):
-#     os.chdir(r"D:\Program Files (x86)\kingpdf\Kingsoft PDF\10.1.0.6615\office6")
-#     print(os.getcwd())
-#     os.popen(r'start .\wpspdf.exe "'+r'D:\aa_work\新学期项目及论文\心电图项目\心电论文'+'\\'+lb.get(lb.curselection())+'"')
-
+#辅助函数
 def get_files(path,recurse=False):
     '''
     得到指定目录下的所有文件列表，递归或者不递归
@@ -100,29 +101,46 @@ class MyDialog(Toplevel):
         Button(row6, text="quit", command=self.quit).pack(side=LEFT)
     def plot_ECG(self):
         #输入显示的单段长度
-        data_len=15000
         length=int(self.start_rowInput.get()) if self.start_rowInput.get() else 3000
-        rows=15000//length+1
-        plot_data=self.get_ECG(self.comboxlist.get())
+        #导联数据
+        plot_data=self.get_ECG(self.comboxlist.get())#get()返回字符串
+        #这里的数据还是字符串形式,强制转换
+        plot_data=[int(i) for i in plot_data]
+        #切分长度
+        data_len=len(plot_data)
+        rows=data_len//length+1
+        print('length: {}'.format(data_len))
         
         self.fig.clf()
-        for i in range(1,rows+1):
+        
+        # ax1=self.fig.add_subplot(1,1,1)
+        # # max_value=max(plot_data)
+        # # min_value=min(plot_data)
+        # # my_y_ticks =range(min_value, max_value,(max_value-min_value)//2)
+        # # plt.yticks(my_y_ticks)
+        # ax1.plot(plot_data[:1000])
+
+        for i in range(1,rows):
             ax1=self.fig.add_subplot(rows,1,i)
-            ax1.set_title(self.comboxlist.get())
+            # ax1.set_title(self.comboxlist.get())
             if i!=rows:
                 ax1.plot(plot_data[length*(i-1):length*i])
             else:
                 ax1.plot(plot_data[length*(i-1):])
+        #调整子图间距
+        self.fig.tight_layout()
         self.canvas.show()
 
     def get_ECG(self,lead):
-        #读取数据文件
+        #读取对应导联数据文件
         if not hasattr(self,'data_list'):
             print('cache data_list!')
             with open(os.path.join(Current_path,'ECG_DATA',self.filename),'rt') as f:
                 self.data_list=f.readlines()#读取整个文件所有行，保存在一个列表(list)变量中，每行作为一个元素
+        #根据导联名称得到下标
         x=ECG_leads_list.index(lead)
         return self.data_list[x].strip('\n').split(',')
+    
     def quit(self):
         self.destroy() # 销毁窗口
 
