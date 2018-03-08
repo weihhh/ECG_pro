@@ -177,10 +177,8 @@ class Application(Frame):
             logging.info('annotating :{}'.format(file))
             with open(os.path.join(Current_path,'ECG_DATA',file),'rt') as f:
                 #注意这里读取的时候要去掉首尾换行符,这里选取II导联进行识别R峰
-                data_list=f.readlines()[ECG_leads_list.index('MDC_ECG_LEAD_II')].strip('\n').split(',')#读取整个文件所有行，保存在一个列表(list)变量中，每行作为一个元素
-                data_list=[int(i) for i in data_list]
-            threshold,R=R_reco.R_R_THRESHOLD(data_list,500)
-            ann_time=R_reco.R_reco_wlt(data_list,ini_threshold=threshold,R_R=R,freq=500)
+                data_list=f.readlines()[7].strip('\n').split(',')#读取整个文件所有行，保存在一个列表(list)变量中，每行作为一个元素
+            ann_time=R_reco.R_reco_wlt(data_list)
             #写入标注文件
             with open(os.path.join(Current_path,'ECG_DATA',os.path.splitext(file)[0][:-5]+'_ann.txt'),'wt') as f:
                 for time in ann_time:

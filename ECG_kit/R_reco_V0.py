@@ -5,7 +5,7 @@ import math,os
 import numpy as np
 import matplotlib.pyplot as plt
 
-def R_reco_wlt(wave_list,ini_threshold=1.0723,R_R=234.300,freq=360):
+def R_reco_wlt(wave_list,ini_threshold=1.0723,R_R=234.300):
     '''
     wavelet R peak recognition
     '''
@@ -16,6 +16,8 @@ def R_reco_wlt(wave_list,ini_threshold=1.0723,R_R=234.300,freq=360):
     plt.plot(cofes[0:1000])
     plt.show()
     '''
+
+    freq=360;
     num=len(wave_list);
     max_sum=0;
     max_mean=0;
@@ -93,38 +95,5 @@ def get_files(path,recurse=False):
 #             f.write(str(time)+',')
 #             f.write('1'+'\n')
 
-def R_R_THRESHOLD(data_list,freq):
-
-    A=pywt.cwt(data_list,3, 'mexh')
-    coefs = A[0].tolist()[0]
-    num=len(data_list);
-    max_sum=0;
-    max_mean=0;
-    init_maximal=[];
-    maximal=[];  #极大值
-    maxaddr=[];  #极大值时间点
-    summit=[];
-    endsec=20;    #ECG信号的前20秒（用来计算初始阈值和R-R间期）
-    #######################################################计算初始阈值
-    for sec in range(endsec):
-        everysec_data=coefs[freq*sec:freq*(sec+1)];
-        max_sec = max(everysec_data);
-        max_sum = max_sum + max_sec;
-    max_mean = max_sum/endsec;
-    thersold = max_mean*5/9; #初始阈值
-    #print(thersold)
-    #######################################################计算R-R间期
-    scount=0;
-    for i in range(endsec*freq):
-        if coefs[i] > thersold:
-            summit.append(i);
-            scount=scount+1;
-    for j in range(scount):
-        if coefs[summit[j]] > coefs[summit[j]-1] and coefs[summit[j]] > coefs[summit[j]+1]:
-            init_maximal.append(summit[j]);
-    sumR = 0;
-    R= 0;
-    for i in range(len(init_maximal)-1):
-        sumR = sumR + init_maximal[i+1] - init_maximal[i];
-    R = (4/5)*sumR/(len(init_maximal)-1);
-    return thersold,R
+def R_R_THRESHOLD():
+    pass
